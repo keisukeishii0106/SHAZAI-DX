@@ -9,7 +9,7 @@ st.caption("〜 100%自分の非を、宇宙規模の不可抗力へ昇華させ
 # サイドバーでAPIキー設定
 with st.sidebar:
     st.header("設定")
-    api_key = st.text_input("Gemini API Key", type="password")
+    GEMINI_API_KEY = "AIzaSyAiirR-3Aou0h_ZQUDoSd4AU1AkS52BuwI"
     st.info("APIキーを入力して、超理論を起動してください。")
 
 # 入力セクション
