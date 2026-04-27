@@ -6,11 +6,16 @@ st.set_page_config(page_title="不可抗力DX", page_icon="🌌")
 st.title("🌌 不可抗力の論理構築アプリ")
 st.caption("〜 100%自分の非を、宇宙規模の不可抗力へ昇華させる 〜")
 
-# サイドバーでAPIキー設定
+# 【重要】SecretsからAPIキーを取得（誰でも見える場所に配置）
+api_key = st.secrets.get("GEMINI_API_KEY", "")
+
+# サイドバー設定（APIキー入力欄は消去）
 with st.sidebar:
-    st.header("設定")
-    GEMINI_API_KEY = "AIzaSyAiirR-3Aou0h_ZQUDoSd4AU1AkS52BuwI"
-    st.info("APIキーを入力して、超理論を起動してください。")
+    st.header("Status")
+    if api_key:
+        st.success("APIキー接続済み：宇宙の法則と同期中")
+    else:
+        st.error("APIキー未設定：StreamlitのSecretsを確認してください")
 
 # 入力セクション
 st.subheader("1. 事実の入力")
@@ -28,14 +33,13 @@ mode = st.radio(
 # 生成ボタン
 if st.button("超理論へ変換する"):
     if not api_key:
-        st.error("APIキーが入力されていません。サイドバーから入力してください。")
+        st.error("APIキーが設定されていません。")
     elif not user_fact:
         st.warning("言い訳の種となる「事実」を入力してください。")
     else:
         genai.configure(api_key=api_key)
         model = genai.GenerativeModel('gemini-1.5-flash')
         
-        # モードに合わせたプロンプト調整
         prompt = f"""
         あなたは「世界最高の言い訳コンサルタント」です。
         以下の「100%自分が悪い事実」を、指定されたモードで「個人の意志ではどうしようもなかった不可抗力」へと変換してください。
@@ -60,6 +64,5 @@ if st.button("超理論へ変換する"):
             except Exception as e:
                 st.error(f"エラーが発生しました：{e}")
 
-# フッター
 st.markdown("---")
 st.caption("© 2026 不可抗力DX プロジェクトチーム")
