@@ -104,7 +104,7 @@ with col_in1:
 with col_in2:
     target_name = st.text_input("相手の名前：", placeholder="（例：佐藤部長）")
 
-user_fact = st.text_area("罪状（起きてしまった事象）：", placeholder="例：デスクにコーヒーをぶちまけてしまった")
+user_fact = st.text_area("起きてしまった事象：", placeholder="例：デスクにコーヒーをぶちまけてしまった")
 
 spice = st.selectbox("採用する外部要因（スパイス）：", [
     "なし", "太陽フレアの影響", "地磁気の乱れ", "量子力学的なゆらぎ", 
