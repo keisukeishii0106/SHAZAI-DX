@@ -6,42 +6,41 @@ from email.mime.text import MIMEText
 from email.utils import formatdate
 
 # ---------------------------------------------------------
-# 1. ブランディング & デザイン：プレミアム・他責スタイル
+# 1. ブランディング & デザイン
 # ---------------------------------------------------------
-# 昨日生成したロゴマークのURL
-st.image("GEMINI_gazou.png") 
 
+# ★修正ポイント1: 画像ファイル名を定義
+LOGO_URL = "GEMINI_gazou.png" 
+
+# ★修正ポイント2: set_page_config は最初に実行する
 st.set_page_config(
     page_title="謝罪DX Ultra", 
-    page_icon=LOGO_URL, # タブのアイコンもロゴに！
+    page_icon=LOGO_URL, 
     layout="centered"
 )
 
 # CSSでデザインをロゴの雰囲気に統一（紺、紫、金、サイバーブルー）
 st.markdown(f"""
     <style>
-    /* 全体の背景：プレミアム・ネイビー */
     .stApp {{
         background-color: #0f172a;
         color: #f8fafc;
     }}
     
-    /* ロゴとタイトルエリアのセンター配置 */
     .logo-container {{
         text-align: center;
         padding-bottom: 20px;
-        border-bottom: 2px double #D4AF37; /* ゴールドの二重線 */
+        border-bottom: 2px double #D4AF37; 
         margin-bottom: 30px;
     }}
     
     .logo-img {{
-        width: 150px; /* ロゴのサイズ調整 */
-        border-radius: 50%; /* 丸く切り抜く */
-        border: 4px solid #D4AF37; /* ゴールドの枠 */
-        box-shadow: 0 0 20px rgba(106, 27, 154, 0.5); /* 紫の後光 */
+        width: 150px; 
+        border-radius: 50%; 
+        border: 4px solid #D4AF37; 
+        box-shadow: 0 0 20px rgba(106, 27, 154, 0.5); 
     }}
     
-    /* タイトル：サイバー・ゴールド */
     h1 {{
         color: #D4AF37;
         font-family: 'Georgia', serif;
@@ -50,61 +49,56 @@ st.markdown(f"""
         text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
     }}
     
-    /* サブタイトル */
     .stCaption {{
         color: #cbd5e1;
         text-align: center;
     }}
     
-    /* 入力エリアのラベル色 */
     label p {{
         color: #f3e5f5 !important;
         font-weight: bold;
     }}
 
-    /* ボタン：Ultra・グラデーション */
     .stButton>button {{
         width: 100%;
         border-radius: 30px;
-        background: linear-gradient(45deg, #7b1fa2, #00ffcc); /* 紫からサイバーブルーへ */
+        background: linear-gradient(45deg, #7b1fa2, #00ffcc); 
         color: #0f172a;
         font-weight: 900;
         font-size: 1.3em;
         border: none;
         height: 3.5em;
         transition: 0.3s;
-        text-shadow: none;
     }}
     .stButton>button:hover {{
-        background: linear-gradient(45deg, #00ffcc, #D4AF37); /* ブルーからゴールドへ */
-        color: #0f172a;
+        background: linear-gradient(45deg, #00ffcc, #D4AF37); 
         box-shadow: 0 0 30px rgba(0, 255, 204, 0.7);
     }}
     
-    /* 情報表示エリア（info）の色調整 */
     .stAlert {{
         background-color: rgba(106, 27, 154, 0.2);
         border: 1px solid #6a1b9a;
         color: #f3e5f5;
     }}
-    
-    /* スライダーの色 */
-    .stSlider {{
-        color: #D4AF37;
-    }}
     </style>
     """, unsafe_allow_html=True)
 
 # --- ロゴとタイトルの表示 ---
-st.markdown(f"""
+# 実際のファイルを表示するために st.image も併用します
+col1, col2, col3 = st.columns([1, 1, 1])
+with col2:
+    st.image(LOGO_URL)
+
+st.markdown("""
     <div class="logo-container">
-        <img src="{LOGO_URL}" class="logo-img">
         <h1>謝罪DX Ultra</h1>
     </div>
     """, unsafe_allow_html=True)
 
-st.caption("個人の過失を量子力学・地磁気・太陽フレアの責任へと戦略的に転送する、次世代の他責化ソリューション。謝罪という非生産的なコストを削減し、日本経済のレジリエンスを言い訳によって強化します。")
+# --- 以下、元のロジックのまま ---
+st.caption("個人の過失を量子力学・地磁気・太陽フレアの責任へと戦略的に転送する、次世代の他責化ソリューション。")
 
+# (ここから下の Secrets や入力セクションなどは変更なしでOKです)
 # Secrets
 api_key = st.secrets.get("GEMINI_API_KEY", "")
 gmail_user = st.secrets.get("GMAIL_USER", "")
