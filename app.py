@@ -9,7 +9,7 @@ from email.utils import formatdate
 # 1. ブランディング & デザイン：プレミアム・他責スタイル
 # ---------------------------------------------------------
 # 昨日生成したロゴマークのURL
-LOGO_URL = "file:///C:/Users/keisu/Downloads/GEMINI_gazou.png" 
+st.image("GEMINI_gazou.png") 
 
 st.set_page_config(
     page_title="謝罪DX Ultra", 
