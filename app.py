@@ -1,5 +1,3 @@
-🛠️ 【NameError修正済】app.py：謝罪DX Ultra（完全版）
-Python
 import streamlit as st
 import google.generativeai as genai
 import smtplib
