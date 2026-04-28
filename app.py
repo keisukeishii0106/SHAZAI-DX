@@ -138,4 +138,4 @@ if 'result' in st.session_state:
 
 st.markdown("---")
 footer_name = my_name if my_name else "Guest User"
-st.caption(f"監修: {footer_name} (Registered SME Consultant)")
+st.caption("監修: いしいけいすけ (Registered SME Consultant)")
