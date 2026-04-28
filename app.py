@@ -8,12 +8,9 @@ from email.utils import formatdate
 # ---------------------------------------------------------
 # 1. ブランディング & デザイン：プレミアム・他責スタイル
 # ---------------------------------------------------------
-# 昨日生成したロゴマークのURL
-LOGO_URL = "https://image.api.playgroundai.com/l/clsdn9z4v000808l2e3v4n4c7.png" 
 
 st.set_page_config(
     page_title="謝罪DX Ultra", 
-    page_icon=LOGO_URL, # タブのアイコンもロゴに！
     layout="centered"
 )
 
@@ -26,22 +23,7 @@ st.markdown(f"""
         color: #f8fafc;
     }}
     
-    /* ロゴとタイトルエリアのセンター配置 */
-    .logo-container {{
-        text-align: center;
-        padding-bottom: 20px;
-        border-bottom: 2px double #D4AF37; /* ゴールドの二重線 */
-        margin-bottom: 30px;
-    }}
-    
-    .logo-img {{
-        width: 150px; /* ロゴのサイズ調整 */
-        border-radius: 50%; /* 丸く切り抜く */
-        border: 4px solid #D4AF37; /* ゴールドの枠 */
-        box-shadow: 0 0 20px rgba(106, 27, 154, 0.5); /* 紫の後光 */
-    }}
-    
-    /* タイトル：サイバー・ゴールド */
+/* タイトル：サイバー・ゴールド */
     h1 {{
         color: #D4AF37;
         font-family: 'Georgia', serif;
@@ -94,11 +76,6 @@ st.markdown(f"""
     }}
     </style>
     """, unsafe_allow_html=True)
-
-# --- ロゴとタイトルの表示 ---
-st.markdown(f"""
-    <div class="logo-container">
-        <img src="{LOGO_URL}" class="logo-img">
         <h1>謝罪DX Ultra</h1>
     </div>
     """, unsafe_allow_html=True)
