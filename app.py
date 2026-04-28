@@ -1,81 +1,7 @@
-import streamlit as st
-import google.generativeai as genai
-import smtplib
-import random
-from email.mime.text import MIMEText
-from email.utils import formatdate
-
-# ---------------------------------------------------------
-# 1. ブランディング & デザイン：プレミアム・他責スタイル
-# ---------------------------------------------------------
-
-st.set_page_config(
-    page_title="謝罪DX Ultra", 
-    layout="centered"
-)
-
-# CSSでデザインをロゴの雰囲気に統一（紺、紫、金、サイバーブルー）
+# --- ロゴとタイトルの表示 ---
 st.markdown(f"""
-    <style>
-    /* 全体の背景：プレミアム・ネイビー */
-    .stApp {{
-        background-color: #0f172a;
-        color: #f8fafc;
-    }}
-    
-/* タイトル：サイバー・ゴールド */
-    h1 {{
-        color: #D4AF37;
-        font-family: 'Georgia', serif;
-        font-weight: 900;
-        text-align: center;
-        text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
-    }}
-    
-    /* サブタイトル */
-    .stCaption {{
-        color: #cbd5e1;
-        text-align: center;
-    }}
-    
-    /* 入力エリアのラベル色 */
-    label p {{
-        color: #f3e5f5 !important;
-        font-weight: bold;
-    }}
-
-    /* ボタン：Ultra・グラデーション */
-    .stButton>button {{
-        width: 100%;
-        border-radius: 30px;
-        background: linear-gradient(45deg, #7b1fa2, #00ffcc); /* 紫からサイバーブルーへ */
-        color: #0f172a;
-        font-weight: 900;
-        font-size: 1.3em;
-        border: none;
-        height: 3.5em;
-        transition: 0.3s;
-        text-shadow: none;
-    }}
-    .stButton>button:hover {{
-        background: linear-gradient(45deg, #00ffcc, #D4AF37); /* ブルーからゴールドへ */
-        color: #0f172a;
-        box-shadow: 0 0 30px rgba(0, 255, 204, 0.7);
-    }}
-    
-    /* 情報表示エリア（info）の色調整 */
-    .stAlert {{
-        background-color: rgba(106, 27, 154, 0.2);
-        border: 1px solid #6a1b9a;
-        color: #f3e5f5;
-    }}
-    
-    /* スライダーの色 */
-    .stSlider {{
-        color: #D4AF37;
-    }}
-    </style>
-    """, unsafe_allow_html=True)
+    <div class="logo-container">
+        <img src="{LOGO_URL}" class="logo-img">
         <h1>謝罪DX Ultra</h1>
     </div>
     """, unsafe_allow_html=True)
@@ -147,7 +73,7 @@ if st.button("超理論を次元構築（Ultra Build）"):
             【指令】:
             1. 挨拶：{target_name}との関係性を考慮し、「お疲れ様です」または「お世話になっております」など、最も自然なものを選んで開始すること（もし名乗りがブランクなら、名乗らなくて良い）。
             2. 長さ：200文字以内。
-            3. 理論：{spice}を原因として組み込み、「これは個人の努力では回避不能な、日本経済のレジリエンスに関わる事態である」というスタンスで記述すること。
+            3. 理論：{spice}を原因として組み込み、「これは個人の努力では回避不能である」というスタンスで記述すること。
             4. 自分の非を一切認めず、むしろ自分も被害者であるかのように振る舞うこと。
             """
             
