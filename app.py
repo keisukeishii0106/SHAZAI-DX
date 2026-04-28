@@ -8,10 +8,8 @@ from email.utils import formatdate
 # ---------------------------------------------------------
 # 1. ブランディング & ページ設定
 # ---------------------------------------------------------
-# 画像ファイル名の定義（app.pyと同じフォルダにある前提）
 LOGO_FILE = "GEMINI_gazou.png" 
 
-# ページ設定（必ず最初に実行）
 st.set_page_config(
     page_title="謝罪DX Ultra", 
     page_icon=LOGO_FILE, 
@@ -23,21 +21,16 @@ st.set_page_config(
 # ---------------------------------------------------------
 st.markdown(f"""
     <style>
-    /* 全体の背景：プレミアム・ネイビー */
     .stApp {{
         background-color: #0f172a;
         color: #f8fafc;
     }}
-    
-    /* ロゴとタイトルのコンテナ */
     .logo-container {{
         text-align: center;
         padding-bottom: 10px;
         border-bottom: 2px double #D4AF37; 
         margin-bottom: 20px;
     }}
-    
-    /* タイトル：サイバー・ゴールド */
     h1 {{
         color: #D4AF37;
         font-family: 'Georgia', serif;
@@ -45,25 +38,19 @@ st.markdown(f"""
         text-align: center;
         text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
     }}
-
-    /* 生成された「超理論」の表示エリア（ここを読みやすく修正） */
     .stAlert {{
-        background-color: #ffffff !important; /* 背景を白にして視認性を最大化 */
-        color: #0f172a !important;           /* 文字を濃いネイビーに */
-        border: 3px solid #00ffcc !important; /* 枠線をサイバーブルーに */
+        background-color: #ffffff !important; 
+        color: #0f172a !important;           
+        border: 3px solid #00ffcc !important; 
         border-radius: 12px;
         font-size: 1.15em;
         line-height: 1.7;
         box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
     }}
-    
-    /* 入力エリアのラベル */
     label p {{
         color: #f3e5f5 !important;
         font-weight: bold;
     }}
-
-    /* ボタン：Ultra・グラデーション */
     .stButton>button {{
         width: 100%;
         border-radius: 30px;
@@ -80,11 +67,6 @@ st.markdown(f"""
         box-shadow: 0 0 30px rgba(0, 255, 204, 0.7);
         transform: scale(1.02);
     }}
-
-    /* スライダーやセレクトボックスの色調整 */
-    .stSelectbox, .stSlider {{
-        margin-bottom: 20px;
-    }}
     </style>
     """, unsafe_allow_html=True)
 
@@ -94,7 +76,7 @@ with col2:
     try:
         st.image(LOGO_FILE, use_container_width=True)
     except:
-        st.warning("画像が見つかりません。ファイル名を確認してください。")
+        pass
 
 st.markdown('<div class="logo-container"><h1>謝罪DX Ultra</h1></div>', unsafe_allow_html=True)
 st.caption("個人の過失を量子力学・地磁気・太陽フレアの責任へと戦略的に転送する、次世代の他責化ソリューション。")
@@ -122,7 +104,7 @@ with col_in1:
 with col_in2:
     target_name = st.text_input("相手の名前：", placeholder="（例：佐藤部長）")
 
-user_fact = st.text_area("罪状（起きてしまった事象）：", placeholder="例：会議に遅刻した、資料にミスがあった")
+user_fact = st.text_area("罪状（起きてしまった事象）：", placeholder="例：デスクにコーヒーをぶちまけてしまった")
 
 spice = st.selectbox("採用する外部要因（スパイス）：", [
     "なし", "太陽フレアの影響", "地磁気の乱れ", "量子力学的なゆらぎ", 
@@ -135,7 +117,7 @@ mode = st.select_slider(
 )
 
 # ---------------------------------------------------------
-# 5. 生成ロジック
+# 5. 生成ロジック（エラー対策版）
 # ---------------------------------------------------------
 if st.button("超理論を次元構築（Ultra Build）"):
     if not api_key:
@@ -145,12 +127,26 @@ if st.button("超理論を次元構築（Ultra Build）"):
     else:
         try:
             genai.configure(api_key=api_key)
-            model = genai.GenerativeModel('gemini-1.5-flash')
+            
+            # ★修正：利用可能なモデルを動的に検索する
+            available_models = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
+            
+            # flashがあれば優先、なければpro、それもなければ取得した最初のモデルを使う
+            selected_model = 'models/gemini-1.5-flash' # デフォルト
+            if 'models/gemini-1.5-flash' in available_models:
+                selected_model = 'models/gemini-1.5-flash'
+            elif 'models/gemini-pro' in available_models:
+                selected_model = 'models/gemini-pro'
+            elif available_models:
+                selected_model = available_models[0]
+            
+            model = genai.GenerativeModel(selected_model)
             
             prompt = f"""
             あなたは世界最高の戦略的言い訳コンサルタントです。
             以下の情報を元に、個人の過失を外部要因へ転送する「超理論」を作成してください。
             【宛名】: {target_name} / 【差出人】: {my_name} / 【事象】: {user_fact} / 【要因】: {spice} / 【強度】: {mode}
+            
             指令：
             1. 自然な挨拶から開始。
             2. 200文字以内。
@@ -162,16 +158,15 @@ if st.button("超理論を次元構築（Ultra Build）"):
                 response = model.generate_content(prompt)
                 st.session_state.result = response.text
                 st.session_state.risk = random.randint(0, 100)
-                st.success("理論構築完了！")
+                st.success(f"理論構築完了！ (Model: {selected_model})")
         except Exception as e:
-            st.error(f"Error: {e}")
+            st.error(f"モデル接続エラー: {e}")
 
 # ---------------------------------------------------------
 # 6. 表示 & 送信
 # ---------------------------------------------------------
 if 'result' in st.session_state:
     st.markdown("---")
-    # 生成された文章（白背景カードで表示）
     st.info(st.session_state.result)
     
     risk = st.session_state.risk
