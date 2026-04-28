@@ -5,39 +5,53 @@ from email.mime.text import MIMEText
 from email.utils import formatdate
 
 # ---------------------------------------------------------
-# 1. デザインの最強ブラッシュアップ (CSSカスタマイズ)
+# 1. デザイン：視認性重視の「プロ仕様」カスタマイズ
 # ---------------------------------------------------------
 st.set_page_config(page_title="不可抗力DX Pro", page_icon="🚀", layout="centered")
 
 st.markdown("""
     <style>
+    /* 全体の背景を明るいグレーに */
     .stApp {
-        background-color: #0e1117;
+        background-color: #f8f9fa;
+        color: #212529;
     }
+    /* タイトル：深みのあるエメラルドで見やすく */
     h1 {
-        color: #00ffcc;
-        text-shadow: 0 0 10px #00ffcc;
-        font-family: 'Courier New', Courier, monospace;
+        color: #00796b;
+        font-family: 'Helvetica Neue', Arial, sans-serif;
+        font-weight: 800;
+        border-bottom: 2px solid #00796b;
+        padding-bottom: 10px;
     }
+    /* サブヘッダー */
+    h3 {
+        color: #495057;
+    }
+    /* ボタン：押しやすさと高級感を両立 */
     .stButton>button {
         width: 100%;
-        border-radius: 20px;
-        background-color: #00ffcc;
-        color: black;
-        font-weight: bold;
+        border-radius: 10px;
+        background-color: #00796b;
+        color: white;
+        height: 3em;
+        font-size: 1.2em;
         border: none;
         transition: 0.3s;
     }
     .stButton>button:hover {
-        background-color: #ff00ff;
-        color: white;
-        box-shadow: 0 0 20px #ff00ff;
+        background-color: #004d40;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    /* テキストエリアと入力欄をクッキリさせる */
+    textarea, input {
+        border: 2px solid #ced4da !important;
     }
     </style>
     """, unsafe_allow_html=True)
 
 st.title("🚀 不可抗力DX Pro")
-st.caption("〜 石井渓介の手によって生み出された、究極の他責システム 〜")
+st.caption("〜 管理企画の英知を集結させた、究極の他責システム 〜")
 
 # Secretsから読み込み
 api_key = st.secrets.get("GEMINI_API_KEY", "")
@@ -45,18 +59,18 @@ gmail_user = st.secrets.get("GMAIL_USER", "")
 gmail_password = st.secrets.get("GMAIL_PASSWORD", "")
 
 # ---------------------------------------------------------
-# 2. ロジック & UI
+# 2. メインロジック
 # ---------------------------------------------------------
 with st.sidebar:
     st.header("🛰️ System Status")
     if api_key and gmail_user:
         st.success("All Systems GO")
-        st.info(f"Connected: {gmail_user}")
+        st.write(f"User: {gmail_user}")
     else:
         st.error("Setup Incomplete")
 
 st.subheader("1. 現場の「失態」を報告せよ")
-user_fact = st.text_area("事実を簡潔に：", placeholder="例：寝坊して会議をすっぽかした")
+user_fact = st.text_area("事実を簡潔に：", placeholder="例：寝坊して会議を飛ばした")
 
 st.subheader("2. 戦略的言い訳モード")
 mode = st.select_slider(
@@ -71,21 +85,25 @@ if st.button("超理論をビルドする"):
     else:
         try:
             genai.configure(api_key=api_key)
-            model = genai.GenerativeModel('gemini-1.5-flash')
             
-            # ③ 150文字制限のプロンプト
+            # 【404対策】動くモデルを自動で探し出す最強ロジック
+            model_list = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
+            target_model = model_list[0] if model_list else 'gemini-pro'
+            
+            model = genai.GenerativeModel(target_model)
+            
             prompt = f"""
             あなたは世界最高の言い訳コンサルタントです。
             以下の「事実」を「{mode}」モードで不可抗力に変換してください。
             【事実】: {user_fact}
             
             【制約】:
-            1. 文章は必ず「150文字程度」で完結させること。
+            1. 文章は必ず「150文字以内」で完結させること。
             2. 相手が反論できないほど圧倒的な語彙を使うこと。
             3. 極端なまでのビジネス形式にすること。
             """
             
-            with st.spinner('理論構築中...'):
+            with st.spinner(f'理論構築中（Using: {target_model}）...'):
                 response = model.generate_content(prompt)
                 st.session_state.result = response.text
                 st.success("理論ビルド成功！")
@@ -94,8 +112,10 @@ if st.button("超理論をビルドする"):
 
 # 生成結果の表示
 if 'result' in st.session_state:
-    st.markdown("### 📄 構築された超理論 (150文字サマリー)")
-    st.code(st.session_state.result, language="text")
+    st.markdown("---")
+    st.markdown("### 📄 構築された超理論 (150文字要約)")
+    # 見やすいように背景を少し変えたエリアに表示
+    st.info(st.session_state.result)
 
     # ---------------------------------------------------------
     # 3. Gmail連携機能
@@ -110,14 +130,12 @@ if 'result' in st.session_state:
             st.warning("送信先を入れてください")
         else:
             try:
-                # メールの作成
                 msg = MIMEText(st.session_state.result)
                 msg['Subject'] = "【重要】本日の事象に関するご報告"
                 msg['From'] = gmail_user
                 msg['To'] = dest_email
                 msg['Date'] = formatdate(localtime=True)
 
-                # 送信
                 with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
                     smtp.login(gmail_user, gmail_password)
                     smtp.send_message(msg)
