@@ -1,11 +1,25 @@
-# --- ロゴとタイトルの表示 ---
-st.markdown(f"""
-    <div class="logo-container">
-        <img src="{LOGO_URL}" class="logo-img">
-        <h1>謝罪DX Ultra</h1>
-    </div>
+import streamlit as st
+import google.generativeai as genai
+import smtplib
+import random
+from email.mime.text import MIMEText
+from email.utils import formatdate
+
+# ---------------------------------------------------------
+# 1. デザイン：高貴なラベンダー（レジリエンス・パープル）
+# ---------------------------------------------------------
+st.set_page_config(page_title="謝罪DX Ultra", page_icon="🙇‍♂️", layout="centered")
+
+st.markdown("""
+    <style>
+    .stApp { background-color: #f3e5f5; color: #4a148c; }
+    h1 { color: #6a1b9a; font-family: 'Helvetica Neue', sans-serif; font-weight: 900; text-align: center; border-bottom: 3px double #6a1b9a; }
+    .stButton>button { width: 100%; border-radius: 30px; background: linear-gradient(45deg, #7b1fa2, #9c27b0); color: white; font-weight: bold; border: none; height: 3.5em; }
+    .stButton>button:hover { background: linear-gradient(45deg, #9c27b0, #e1bee7); color: #4a148c; }
+    </style>
     """, unsafe_allow_html=True)
 
+st.title("🙇‍♂️ 謝罪DX Ultra")
 st.caption("個人の過失を量子力学・地磁気・太陽フレアの責任へと戦略的に転送する、次世代の他責化ソリューション。謝罪という非生産的なコストを削減し、日本経済のレジリエンスを言い訳によって強化します。")
 
 # Secrets
@@ -20,13 +34,12 @@ with st.sidebar:
     st.header("🛰️ System Status")
     if api_key and gmail_user:
         st.success("Resilience System: Online")
-        st.write(f"Logged in: {gmail_user}")
     else:
         st.error("Setup Incomplete")
 
 col1, col2 = st.columns(2)
 with col1:
-    my_name = st.text_input("あなたの名前：", value="", placeholder="（例：いしい）")
+    my_name = st.text_input("あなたの名前：", value="", placeholder="（例：石井）")
 with col2:
     target_name = st.text_input("相手の名前：", placeholder="（例：佐藤部長、田中さん）")
 
@@ -48,7 +61,7 @@ mode = st.select_slider(
 # ---------------------------------------------------------
 # 3. 生成ロジック
 # ---------------------------------------------------------
-if st.button("超理論を次元構築（Ultra Build）"):
+if st.button("超理論を次元構築する"):
     if not api_key:
         st.error("APIキーが未設定です")
     elif not user_fact or not target_name:
@@ -71,9 +84,9 @@ if st.button("超理論を次元構築（Ultra Build）"):
             【モード】: {mode}
             
             【指令】:
-            1. 挨拶：{target_name}との関係性を考慮し、「お疲れ様です」または「お世話になっております」など、最も自然なものを選んで開始すること（もし名乗りがブランクなら、名乗らなくて良い）。
+            1. 挨拶：{target_name}との関係性を考慮し、「お世話になっております」または「お疲れ様です」など、最も自然なものを選んで開始すること。
             2. 長さ：200文字以内。
-            3. 理論：{spice}を原因として組み込み、「これは個人の努力では回避不能である」というスタンスで記述すること。
+            3. 理論：{spice}を原因として組み込み、「これは個人の努力では回避不能」というスタンスで記述すること。
             4. 自分の非を一切認めず、むしろ自分も被害者であるかのように振る舞うこと。
             """
             
@@ -90,7 +103,6 @@ if st.button("超理論を次元構築（Ultra Build）"):
 # ---------------------------------------------------------
 if 'result' in st.session_state:
     st.markdown("---")
-    # ロゴの色に合わせてサイバーブルーのテキストエリアに表示
     st.info(st.session_state.result)
     
     risk = st.session_state.risk
@@ -102,7 +114,7 @@ if 'result' in st.session_state:
     st.subheader("📩 責任転送（Gmail送信）")
     dest_email = st.text_input("送信先メールアドレス：", placeholder="boss@example.com")
     
-    if st.button("この理論を送信（Resilience Transfer）"):
+    if st.button("この理論を送信する"):
         try:
             # 署名の作成 (名前が空ならブランク)
             sig_name = my_name if my_name else ""
@@ -125,5 +137,5 @@ if 'result' in st.session_state:
             st.error(f"送信エラー: {e}")
 
 st.markdown("---")
-# フッターをひらがな固定に変更
-st.caption("監修: いしいけいすけ (Registered SME Consultant)")
+footer_name = my_name if my_name else "Guest User"
+st.caption("開発者: いしいけいすけ (Registered SME Consultant)")
