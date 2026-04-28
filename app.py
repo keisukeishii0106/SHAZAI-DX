@@ -6,20 +6,103 @@ from email.mime.text import MIMEText
 from email.utils import formatdate
 
 # ---------------------------------------------------------
-# 1. デザイン：高貴なラベンダー（レジリエンス・パープル）
+# 1. ブランディング & デザイン：プレミアム・他責スタイル
 # ---------------------------------------------------------
-st.set_page_config(page_title="謝罪DX Ultra", page_icon="🙇‍♂️", layout="centered")
+# 昨日生成したロゴマークのURL
+LOGO_URL = "https://image.api.playgroundai.com/l/clsdn9z4v000808l2e3v4n4c7.png" 
 
-st.markdown("""
+st.set_page_config(
+    page_title="謝罪DX Ultra", 
+    page_icon=LOGO_URL, # タブのアイコンもロゴに！
+    layout="centered"
+)
+
+# CSSでデザインをロゴの雰囲気に統一（紺、紫、金、サイバーブルー）
+st.markdown(f"""
     <style>
-    .stApp { background-color: #f3e5f5; color: #4a148c; }
-    h1 { color: #6a1b9a; font-family: 'Helvetica Neue', sans-serif; font-weight: 900; text-align: center; border-bottom: 3px double #6a1b9a; }
-    .stButton>button { width: 100%; border-radius: 30px; background: linear-gradient(45deg, #7b1fa2, #9c27b0); color: white; font-weight: bold; border: none; height: 3.5em; }
-    .stButton>button:hover { background: linear-gradient(45deg, #9c27b0, #e1bee7); color: #4a148c; }
+    /* 全体の背景：プレミアム・ネイビー */
+    .stApp {{
+        background-color: #0f172a;
+        color: #f8fafc;
+    }}
+    
+    /* ロゴとタイトルエリアのセンター配置 */
+    .logo-container {{
+        text-align: center;
+        padding-bottom: 20px;
+        border-bottom: 2px double #D4AF37; /* ゴールドの二重線 */
+        margin-bottom: 30px;
+    }}
+    
+    .logo-img {{
+        width: 150px; /* ロゴのサイズ調整 */
+        border-radius: 50%; /* 丸く切り抜く */
+        border: 4px solid #D4AF37; /* ゴールドの枠 */
+        box-shadow: 0 0 20px rgba(106, 27, 154, 0.5); /* 紫の後光 */
+    }}
+    
+    /* タイトル：サイバー・ゴールド */
+    h1 {{
+        color: #D4AF37;
+        font-family: 'Georgia', serif;
+        font-weight: 900;
+        text-align: center;
+        text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+    }}
+    
+    /* サブタイトル */
+    .stCaption {{
+        color: #cbd5e1;
+        text-align: center;
+    }}
+    
+    /* 入力エリアのラベル色 */
+    label p {{
+        color: #f3e5f5 !important;
+        font-weight: bold;
+    }}
+
+    /* ボタン：Ultra・グラデーション */
+    .stButton>button {{
+        width: 100%;
+        border-radius: 30px;
+        background: linear-gradient(45deg, #7b1fa2, #00ffcc); /* 紫からサイバーブルーへ */
+        color: #0f172a;
+        font-weight: 900;
+        font-size: 1.3em;
+        border: none;
+        height: 3.5em;
+        transition: 0.3s;
+        text-shadow: none;
+    }}
+    .stButton>button:hover {{
+        background: linear-gradient(45deg, #00ffcc, #D4AF37); /* ブルーからゴールドへ */
+        color: #0f172a;
+        box-shadow: 0 0 30px rgba(0, 255, 204, 0.7);
+    }}
+    
+    /* 情報表示エリア（info）の色調整 */
+    .stAlert {{
+        background-color: rgba(106, 27, 154, 0.2);
+        border: 1px solid #6a1b9a;
+        color: #f3e5f5;
+    }}
+    
+    /* スライダーの色 */
+    .stSlider {{
+        color: #D4AF37;
+    }}
     </style>
     """, unsafe_allow_html=True)
 
-st.title("🙇‍♂️ 謝罪DX Ultra")
+# --- ロゴとタイトルの表示 ---
+st.markdown(f"""
+    <div class="logo-container">
+        <img src="{LOGO_URL}" class="logo-img">
+        <h1>謝罪DX Ultra</h1>
+    </div>
+    """, unsafe_allow_html=True)
+
 st.caption("個人の過失を量子力学・地磁気・太陽フレアの責任へと戦略的に転送する、次世代の他責化ソリューション。謝罪という非生産的なコストを削減し、日本経済のレジリエンスを言い訳によって強化します。")
 
 # Secrets
@@ -34,12 +117,13 @@ with st.sidebar:
     st.header("🛰️ System Status")
     if api_key and gmail_user:
         st.success("Resilience System: Online")
+        st.write(f"Logged in: {gmail_user}")
     else:
         st.error("Setup Incomplete")
 
 col1, col2 = st.columns(2)
 with col1:
-    my_name = st.text_input("あなたの名前：", value="", placeholder="（例：石井）")
+    my_name = st.text_input("あなたの名前：", value="", placeholder="（例：いしい）")
 with col2:
     target_name = st.text_input("相手の名前：", placeholder="（例：佐藤部長、田中さん）")
 
@@ -61,7 +145,7 @@ mode = st.select_slider(
 # ---------------------------------------------------------
 # 3. 生成ロジック
 # ---------------------------------------------------------
-if st.button("超理論を次元構築する"):
+if st.button("超理論を次元構築（Ultra Build）"):
     if not api_key:
         st.error("APIキーが未設定です")
     elif not user_fact or not target_name:
@@ -84,9 +168,9 @@ if st.button("超理論を次元構築する"):
             【モード】: {mode}
             
             【指令】:
-            1. 挨拶：{target_name}との関係性を考慮し、「お世話になっております」または「お疲れ様です」など、最も自然なものを選んで開始すること。
+            1. 挨拶：{target_name}との関係性を考慮し、「お疲れ様です」または「お世話になっております」など、最も自然なものを選んで開始すること（もし名乗りがブランクなら、名乗らなくて良い）。
             2. 長さ：200文字以内。
-            3. 理論：{spice}を原因として組み込み、「これは個人の努力では回避不能」というスタンスで記述すること。
+            3. 理論：{spice}を原因として組み込み、「これは個人の努力では回避不能な、日本経済のレジリエンスに関わる事態である」というスタンスで記述すること。
             4. 自分の非を一切認めず、むしろ自分も被害者であるかのように振る舞うこと。
             """
             
@@ -103,6 +187,7 @@ if st.button("超理論を次元構築する"):
 # ---------------------------------------------------------
 if 'result' in st.session_state:
     st.markdown("---")
+    # ロゴの色に合わせてサイバーブルーのテキストエリアに表示
     st.info(st.session_state.result)
     
     risk = st.session_state.risk
@@ -114,7 +199,7 @@ if 'result' in st.session_state:
     st.subheader("📩 責任転送（Gmail送信）")
     dest_email = st.text_input("送信先メールアドレス：", placeholder="boss@example.com")
     
-    if st.button("この理論を送信する"):
+    if st.button("この理論を送信（Resilience Transfer）"):
         try:
             # 署名の作成 (名前が空ならブランク)
             sig_name = my_name if my_name else ""
@@ -137,5 +222,5 @@ if 'result' in st.session_state:
             st.error(f"送信エラー: {e}")
 
 st.markdown("---")
-footer_name = my_name if my_name else "Guest User"
-st.caption("開発者: いしいけいすけ (Registered SME Consultant)")
+# フッターをひらがな固定に変更
+st.caption("監修: いしいけいすけ (Registered SME Consultant)")
