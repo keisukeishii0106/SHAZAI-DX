@@ -104,7 +104,7 @@ with col_in1:
 with col_in2:
     target_name = st.text_input("相手の名前：", placeholder="（例：佐藤部長）")
 
-user_fact = st.text_area("罪状（起きてしまった事象）：", placeholder="例：デスクにコーヒーをぶちまけてしまった")
+user_fact = st.text_area("起きてしまった事象：", placeholder="例：デスクにコーヒーをぶちまけてしまった")
 
 mode = st.select_slider(
     "転送強度（他責レベル）：",
