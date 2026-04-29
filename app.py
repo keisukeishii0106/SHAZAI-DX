@@ -13,7 +13,7 @@ if 'apology_rank' not in st.session_state:
     st.session_state.apology_rank = "見習い謝罪師"
 
 # ---------------------------------------------------------
-# 2. デザイン (モード選択の文字を白くする！)
+# 2. デザイン (宇宙ボタン & モード文字白化)
 # ---------------------------------------------------------
 st.markdown("""
     <style>
@@ -24,36 +24,57 @@ st.markdown("""
     .centered-logo { display: flex; justify-content: center; margin-bottom: 20px; }
     .centered-logo img { width: 450px !important; }
 
-    /* ★モード選択（ラジオボタン）の文字を白く、太くする */
+    /* モード選択の文字を「絶対」白く太く */
     div[data-testid="stRadio"] label p {
         color: #ffffff !important;
         font-weight: 900 !important;
-        font-size: 1.1em !important;
-        text-shadow: 1px 1px 2px #000; /* 読みやすくするための影 */
+        font-size: 1.15em !important;
     }
     
-    /* 入力欄のラベル（あなたの名前：等）も白く */
-    .stTextInput label, .stTextArea label, div[data-testid="stMarkdownContainer"] p {
+    /* 入力欄ラベルの白化 */
+    .stTextInput label, .stTextArea label {
         color: #ffffff !important;
         font-weight: bold !important;
     }
 
-    /* ボタンの強制色付け（何があっても白くさせない） */
+    /* --- 生成ボタンのデザイン --- */
     div.stButton > button {
         width: 100% !important;
-        height: 4em !important;
-        border-radius: 12px !important;
-        border: none !important;
+        height: 4.5em !important;
+        border-radius: 15px !important;
+        border: 2px solid rgba(255, 255, 255, 0.2) !important;
         font-weight: 900 !important;
-        color: #ffffff !important;
-        display: block !important;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     }
 
-    .sincere-btn div.stButton > button { background-color: #2563eb !important; }
-    .ultra-btn div.stButton > button { background: linear-gradient(45deg, #7c3aed, #d4af37) !important; }
-    
+    /* 誠心誠意モード：清潔感のあるビジネスブルー */
+    .sincere-btn div.stButton > button {
+        background: linear-gradient(135deg, #2563eb, #1e40af) !important;
+        color: #ffffff !important;
+    }
+
+    /* 他責モード：【復活】宇宙グラデーション */
+    .ultra-btn div.stButton > button {
+        background: linear-gradient(135deg, #4c1d95, #7c3aed, #d4af37) !important;
+        background-size: 200% 200% !important;
+        color: #ffffff !important;
+        animation: space-shimmer 3s ease infinite;
+        border: 2px solid #d4af37 !important; /* 金の縁取り */
+    }
+
+    @keyframes space-shimmer {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
     /* ボタンの中の文字 */
-    div.stButton > button p { color: #ffffff !important; font-size: 1.2em !important; }
+    div.stButton > button p {
+        color: #ffffff !important;
+        font-size: 1.3em !important;
+        letter-spacing: 2px;
+    }
 
     /* 結果表示カード */
     .result-card {
@@ -68,7 +89,7 @@ st.markdown("""
     """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# 3. ヘッダー & サイドバー
+# 3. ヘッダー
 # ---------------------------------------------------------
 st.markdown('<div class="centered-logo">', unsafe_allow_html=True)
 try: st.image("GEMINI_gazou.png")
@@ -76,13 +97,8 @@ except: st.write("🌌")
 st.markdown('</div>', unsafe_allow_html=True)
 st.markdown('<h1 style="text-align: center; color:#e0e7ff;">謝罪DX Ultra</h1>', unsafe_allow_html=True)
 
-with st.sidebar:
-    st.header("🏆 ステータス")
-    st.metric("累計ポイント", f"{st.session_state.sp_points} SP")
-    st.write(f"称号: **{st.session_state.apology_rank}**")
-
 # ---------------------------------------------------------
-# 4. 入力エリア (文字は白く設定済み)
+# 4. 入力エリア
 # ---------------------------------------------------------
 app_mode = st.radio("モード選択：", ["誠心誠意", "他責（Ultra Resilience）"], horizontal=True)
 
@@ -94,40 +110,38 @@ with col2:
 
 user_fact = st.text_area("起きてしまった事象：", placeholder="例：デスクにコーヒーをぶちまけてしまった")
 
-# ボタン配置
+# --- 宇宙ボタンの配置 ---
 if app_mode == "誠心誠意":
     st.markdown('<div class="sincere-btn">', unsafe_allow_html=True)
-    execute = st.button("謝罪文案の生成")
+    execute = st.button("誠意を込めて生成")
     st.markdown('</div>', unsafe_allow_html=True)
 else:
     st.markdown('<div class="ultra-btn">', unsafe_allow_html=True)
-    execute = st.button("言い訳をひねり出す")
+    execute = st.button("宇宙の理で言い訳する")
     st.markdown('</div>', unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# 5. 生成ロジック (429エラー対策込み)
+# 5. ロジック
 # ---------------------------------------------------------
 if execute:
     api_key = st.secrets.get("GEMINI_API_KEY")
     if not api_key:
-        st.error("APIキーが必要です")
+        st.error("APIキー未設定です")
     else:
         try:
             genai.configure(api_key=api_key)
             model = genai.GenerativeModel('gemini-1.5-flash')
-            with st.spinner('AIが必死に謝罪/他責中...'):
-                response = model.generate_content(f"{user_fact}の謝罪文を150字で。")
+            with st.spinner('計算中...'):
+                response = model.generate_content(f"{user_fact}の謝罪文を。")
                 st.session_state.result_text = response.text
-                st.session_state.sp_points += random.randint(30, 70)
         except Exception as e:
             if "429" in str(e):
-                st.error("【1日の制限に達しました】")
-                st.info("APIの無料枠を使い切りました。明日の夕方までお待ちいただくか、新しいAPIキーを設定してください。")
+                st.error("【API制限中】1日の上限を超えました。")
+                st.info("見た目の確認は完了です！明日の復活をお楽しみに！")
             else:
                 st.error(f"エラー: {e}")
 
 if 'result_text' in st.session_state:
     st.markdown(f'<div class="result-card">{st.session_state.result_text}</div>', unsafe_allow_html=True)
 
-st.markdown("---")
 st.caption("©開発者：いしいけいすけ(SME Consultant)")
