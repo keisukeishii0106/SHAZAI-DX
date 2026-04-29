@@ -79,7 +79,7 @@ with col2:
         pass
 
 st.markdown('<div class="logo-container"><h1>謝罪DX Ultra</h1></div>', unsafe_allow_html=True)
-st.caption("個人の過失を鮮やかに他責化する、次世代の謝罪DXソリューションアプリ")
+st.caption("やらかしてももう平気！次世代の謝罪DXソリューションアプリ")
 
 # ---------------------------------------------------------
 # 3. システム設定 (Secrets)
