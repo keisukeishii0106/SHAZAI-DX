@@ -6,29 +6,90 @@ from email.mime.text import MIMEText
 from email.utils import formatdate
 
 # ---------------------------------------------------------
-# 1. デザイン：高貴なラベンダー（レジリエンス・パープル）
+# 1. ブランディング & ページ設定
 # ---------------------------------------------------------
-st.set_page_config(page_title="謝罪DX Ultra", page_icon="🙇‍♂️", layout="centered")
+LOGO_FILE = "GEMINI_gazou.png" 
 
-st.markdown("""
+st.set_page_config(
+    page_title="謝罪DX Ultra", 
+    page_icon=LOGO_FILE, 
+    layout="centered"
+)
+
+# ---------------------------------------------------------
+# 2. デザインカスタマイズ (CSS)
+# ---------------------------------------------------------
+st.markdown(f"""
     <style>
-    .stApp { background-color: #f3e5f5; color: #4a148c; }
-    h1 { color: #6a1b9a; font-family: 'Helvetica Neue', sans-serif; font-weight: 900; text-align: center; border-bottom: 3px double #6a1b9a; }
-    .stButton>button { width: 100%; border-radius: 30px; background: linear-gradient(45deg, #7b1fa2, #9c27b0); color: white; font-weight: bold; border: none; height: 3.5em; }
-    .stButton>button:hover { background: linear-gradient(45deg, #9c27b0, #e1bee7); color: #4a148c; }
+    .stApp {{
+        background-color: #0f172a;
+        color: #f8fafc;
+    }}
+    .logo-container {{
+        text-align: center;
+        padding-bottom: 10px;
+        border-bottom: 2px double #D4AF37; 
+        margin-bottom: 20px;
+    }}
+    h1 {{
+        color: #D4AF37;
+        font-family: 'Georgia', serif;
+        font-weight: 900;
+        text-align: center;
+        text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+    }}
+    .stAlert {{
+        background-color: #ffffff !important; 
+        color: #0f172a !important;           
+        border: 3px solid #00ffcc !important; 
+        border-radius: 12px;
+        font-size: 1.15em;
+        line-height: 1.7;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    }}
+    label p {{
+        color: #f3e5f5 !important;
+        font-weight: bold;
+    }}
+    .stButton>button {{
+        width: 100%;
+        border-radius: 30px;
+        background: linear-gradient(45deg, #7b1fa2, #00ffcc); 
+        color: #0f172a;
+        font-weight: 900;
+        font-size: 1.2em;
+        border: none;
+        height: 3.5em;
+        transition: 0.3s;
+    }}
+    .stButton>button:hover {{
+        background: linear-gradient(45deg, #00ffcc, #D4AF37); 
+        box-shadow: 0 0 30px rgba(0, 255, 204, 0.7);
+        transform: scale(1.02);
+    }}
     </style>
     """, unsafe_allow_html=True)
 
-st.title("🙇‍♂️ 謝罪DX Ultra")
-st.caption("個人の過失を量子力学・地磁気・太陽フレアの責任へと戦略的に転送する、次世代の他責化ソリューション。謝罪という非生産的なコストを削減し、日本経済のレジリエンスを言い訳によって強化します。")
+# --- ロゴとタイトルの表示 ---
+col1, col2, col3 = st.columns([1, 1, 1])
+with col2:
+    try:
+        st.image(LOGO_FILE, use_container_width=True)
+    except:
+        pass
 
-# Secrets
+st.markdown('<div class="logo-container"><h1>謝罪DX Ultra</h1></div>', unsafe_allow_html=True)
+st.caption("個人の過失を量子力学・地磁気・太陽フレアの責任へと戦略的に転送する、次世代の他責化ソリューション。")
+
+# ---------------------------------------------------------
+# 3. システム設定 (Secrets)
+# ---------------------------------------------------------
 api_key = st.secrets.get("GEMINI_API_KEY", "")
 gmail_user = st.secrets.get("GMAIL_USER", "")
 gmail_password = st.secrets.get("GMAIL_PASSWORD", "")
 
 # ---------------------------------------------------------
-# 2. 入力セクション
+# 4. 入力セクション
 # ---------------------------------------------------------
 with st.sidebar:
     st.header("🛰️ System Status")
@@ -37,21 +98,18 @@ with st.sidebar:
     else:
         st.error("Setup Incomplete")
 
-col1, col2 = st.columns(2)
-with col1:
-    my_name = st.text_input("あなたの名前：", value="", placeholder="（例：石井）")
-with col2:
-    target_name = st.text_input("相手の名前：", placeholder="（例：佐藤部長、田中さん）")
+col_in1, col_in2 = st.columns(2)
+with col_in1:
+    my_name = st.text_input("あなたの名前：", placeholder="（例：いしい）")
+with col_in2:
+    target_name = st.text_input("相手の名前：", placeholder="（例：佐藤部長）")
 
-st.subheader("📝 戦略的報告が必要な「事象」")
-user_fact = st.text_area("罪状：", placeholder="例：デスクにコーヒーをぶちまけてしまった")
+user_fact = st.text_area("罪状（起きてしまった事象）：", placeholder="例：デスクにコーヒーをぶちまけてしまった")
 
-st.subheader("🎲 不可抗力の注入（スパイス）")
-gacha_list = [
+spice = st.selectbox("採用する外部要因（スパイス）：", [
     "なし", "太陽フレアの影響", "地磁気の乱れ", "量子力学的なゆらぎ", 
     "水星の逆行", "徳の積みが足りなかった", "並行世界の自分との同期"
-]
-spice = st.selectbox("原因として採用する外部要因：", gacha_list)
+])
 
 mode = st.select_slider(
     "転送強度（他責レベル）：",
@@ -59,9 +117,9 @@ mode = st.select_slider(
 )
 
 # ---------------------------------------------------------
-# 3. 生成ロジック
+# 5. 生成ロジック（エラー対策版）
 # ---------------------------------------------------------
-if st.button("超理論を次元構築する"):
+if st.button("超理論を次元構築（Ultra Build）"):
     if not api_key:
         st.error("APIキーが未設定です")
     elif not user_fact or not target_name:
@@ -69,37 +127,43 @@ if st.button("超理論を次元構築する"):
     else:
         try:
             genai.configure(api_key=api_key)
-            model_list = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
-            target_model = model_list[0] if model_list else 'gemini-1.5-flash'
-            model = genai.GenerativeModel(target_model)
+            
+            # ★修正：利用可能なモデルを動的に検索する
+            available_models = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
+            
+            # flashがあれば優先、なければpro、それもなければ取得した最初のモデルを使う
+            selected_model = 'models/gemini-1.5-flash' # デフォルト
+            if 'models/gemini-1.5-flash' in available_models:
+                selected_model = 'models/gemini-1.5-flash'
+            elif 'models/gemini-pro' in available_models:
+                selected_model = 'models/gemini-pro'
+            elif available_models:
+                selected_model = available_models[0]
+            
+            model = genai.GenerativeModel(selected_model)
             
             prompt = f"""
             あなたは世界最高の戦略的言い訳コンサルタントです。
             以下の情報を元に、個人の過失を外部要因へ転送する「超理論」を作成してください。
+            【宛名】: {target_name} / 【差出人】: {my_name} / 【事象】: {user_fact} / 【要因】: {spice} / 【強度】: {mode}
             
-            【宛名】: {target_name}
-            【差出人】: {my_name}
-            【事象】: {user_fact}
-            【外部要因】: {spice}
-            【モード】: {mode}
-            
-            【指令】:
-            1. 挨拶：{target_name}との関係性を考慮し、「お世話になっております」または「お疲れ様です」など、最も自然なものを選んで開始すること。
-            2. 長さ：200文字以内。
-            3. 理論：{spice}を原因として組み込み、「これは個人の努力では回避不能」というスタンスで記述すること。
-            4. 自分の非を一切認めず、むしろ自分も被害者であるかのように振る舞うこと。
+            指令：
+            1. 自然な挨拶から開始。
+            2. 200文字以内。
+            3. {spice}を原因とし「回避不能な事態」であることを強調。
+            4. 非を認めず、自分も被害者であるかのように振る舞うこと。
             """
             
             with st.spinner('宇宙の意志を確認中...'):
                 response = model.generate_content(prompt)
                 st.session_state.result = response.text
                 st.session_state.risk = random.randint(0, 100)
-                st.success("理論構築完了！")
+                st.success(f"理論構築完了！ (Model: {selected_model})")
         except Exception as e:
-            st.error(f"Error: {e}")
+            st.error(f"モデル接続エラー: {e}")
 
 # ---------------------------------------------------------
-# 4. 表示 & 送信
+# 6. 表示 & 送信
 # ---------------------------------------------------------
 if 'result' in st.session_state:
     st.markdown("---")
@@ -114,11 +178,10 @@ if 'result' in st.session_state:
     st.subheader("📩 責任転送（Gmail送信）")
     dest_email = st.text_input("送信先メールアドレス：", placeholder="boss@example.com")
     
-    if st.button("この理論を送信する"):
+    if st.button("この理論を送信（Resilience Transfer）"):
         try:
-            # 署名の作成 (名前が空ならブランク)
             sig_name = my_name if my_name else ""
-            footer = f"\n\n---\n{sig_name}\nSME Consultant | DX Strategist" if sig_name else ""
+            footer = f"\n\n---\n{sig_name}\nSME Consultant | DX Strategist"
             final_text = f"{st.session_state.result}{footer}"
             
             msg = MIMEText(final_text)
@@ -132,10 +195,9 @@ if 'result' in st.session_state:
                 smtp.send_message(msg)
             
             st.balloons()
-            st.success(f"{dest_email} へ送信完了！レジリエンスが強化されました。")
+            st.success("送信完了！レジリエンスが強化されました。")
         except Exception as e:
             st.error(f"送信エラー: {e}")
 
 st.markdown("---")
-footer_name = my_name if my_name else "Guest User"
-st.caption("開発者: いしいけいすけ (Registered SME Consultant)")
+st.caption("監修: いしいけいすけ (Registered SME Consultant)")
