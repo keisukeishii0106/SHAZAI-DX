@@ -8,7 +8,11 @@ from email.utils import formatdate
 # ---------------------------------------------------------
 # 1. ブランディング & ページ設定
 # ---------------------------------------------------------
-LOGO_FILE = "GEMINI_gazou.png" 
+st.markdown('<div class="centered-logo">', unsafe_allow_html=True)
+try: st.image("GEMINI_gazou.png")
+except: st.write("🌌")
+st.markdown('</div>', unsafe_allow_html=True)
+st.markdown('<h1 style="text-align: center; color:#e0e7ff;">謝罪DX Ultra</h1>', unsafe_allow_html=True) 
 
 st.set_page_config(
     page_title="謝罪DX Ultra", 
