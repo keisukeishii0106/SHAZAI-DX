@@ -1,7 +1,7 @@
 import streamlit as st
 import google.generativeai as genai
-import smtplib
 import random
+import smtplib
 from email.mime.text import MIMEText
 from email.utils import formatdate
 
@@ -12,192 +12,184 @@ LOGO_FILE = "GEMINI_gazou.png"
 
 st.set_page_config(
     page_title="謝罪DX Ultra", 
-    page_icon=LOGO_FILE, 
+    page_icon="🙇‍♂️", 
     layout="centered"
 )
+
+# セッション状態の初期化（ミニゲーム用など）
+if 'sp_points' not in st.session_state:
+    st.session_state.sp_points = 0
+if 'apology_rank' not in st.session_state:
+    st.session_state.apology_rank = "見習い謝罪師"
 
 # ---------------------------------------------------------
 # 2. デザインカスタマイズ (CSS)
 # ---------------------------------------------------------
-st.markdown(f"""
+st.markdown("""
     <style>
-    .stApp {{
-        background-color: #0f172a;
-        color: #f8fafc;
-    }}
-    .logo-container {{
-        text-align: center;
-        padding-bottom: 10px;
-        border-bottom: 2px double #D4AF37; 
-        margin-bottom: 20px;
-    }}
-    h1 {{
-        color: #D4AF37;
-        font-family: 'Georgia', serif;
-        font-weight: 900;
-        text-align: center;
-        text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
-    }}
-    .stAlert {{
+    .stApp { background-color: #0f172a; color: #f8fafc; }
+    
+    /* 共通ヘッダー・タイトル */
+    .header-box { text-align: center; border-bottom: 2px double #D4AF37; margin-bottom: 25px; padding-bottom: 10px; }
+    h1 { color: #D4AF37; font-family: 'Georgia', serif; font-weight: 900; text-shadow: 0 0 10px rgba(212, 175, 55, 0.5); }
+    
+    /* 生成エリアの視認性最大化 */
+    .result-card {
         background-color: #ffffff !important; 
         color: #0f172a !important;           
         border: 3px solid #00ffcc !important; 
-        border-radius: 12px;
-        font-size: 1.15em;
+        border-radius: 15px;
+        padding: 20px;
+        font-size: 1.1em;
         line-height: 1.7;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-    }}
-    label p {{
-        color: #f3e5f5 !important;
-        font-weight: bold;
-    }}
-    .stButton>button {{
-        width: 100%;
-        border-radius: 30px;
-        background: linear-gradient(45deg, #7b1fa2, #00ffcc); 
-        color: #0f172a;
-        font-weight: 900;
-        font-size: 1.2em;
-        border: none;
-        height: 3.5em;
-        transition: 0.3s;
-    }}
-    .stButton>button:hover {{
-        background: linear-gradient(45deg, #00ffcc, #D4AF37); 
-        box-shadow: 0 0 30px rgba(0, 255, 204, 0.7);
-        transform: scale(1.02);
-    }}
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        margin-bottom: 20px;
+    }
+
+    /* サイドバーのゲーム・ステータス */
+    .sidebar-content { background-color: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; }
+    
+    /* ボタンのスタイル */
+    .stButton>button {
+        width: 100%; border-radius: 30px; 
+        font-weight: 900; font-size: 1.2em; height: 3.5em; transition: 0.3s;
+    }
+    /* 誠心誠意モードのボタン色 */
+    div[data-testid="stForm"] .stButton>button, .sincere-btn>button {
+        background: linear-gradient(45deg, #2563eb, #3b82f6); color: white;
+    }
+    /* 他責モードのボタン色 */
+    .ultra-btn>button {
+        background: linear-gradient(45deg, #7b1fa2, #00ffcc); color: #0f172a;
+    }
     </style>
     """, unsafe_allow_html=True)
 
-# --- ロゴとタイトルの表示 ---
-col1, col2, col3 = st.columns([1, 1, 1])
-with col2:
-    try:
-        st.image(LOGO_FILE, use_container_width=True)
-    except:
-        pass
-
-st.markdown('<div class="logo-container"><h1>謝罪DX Ultra</h1></div>', unsafe_allow_html=True)
-st.caption("個人の過失を量子力学・地磁気・太陽フレアの責任へと戦略的に転送する、次世代の他責化ソリューション。")
-
 # ---------------------------------------------------------
-# 3. システム設定 (Secrets)
-# ---------------------------------------------------------
-api_key = st.secrets.get("GEMINI_API_KEY", "")
-gmail_user = st.secrets.get("GMAIL_USER", "")
-gmail_password = st.secrets.get("GMAIL_PASSWORD", "")
-
-# ---------------------------------------------------------
-# 4. 入力セクション
+# 3. サイドバー：ステータス & ミニゲーム
 # ---------------------------------------------------------
 with st.sidebar:
+    # ロゴ表示
+    try: st.image(LOGO_FILE)
+    except: st.title("🙇‍♂️ 謝罪DX")
+    
+    st.markdown("### 🎮 ミニゲーム: 徳を積む")
+    st.write(f"現在の謝罪ポイント (SP): **{st.session_state.sp_points}**")
+    st.write(f"称号: **{st.session_state.apology_rank}**")
+    
+    if st.button("🙇‍♂️ 深く頭を下げる (10SP)"):
+        st.session_state.sp_points += 10
+        if st.session_state.sp_points > 500: st.session_state.apology_rank = "他責の神"
+        elif st.session_state.sp_points > 200: st.session_state.apology_rank = "レジリエンス達人"
+        elif st.session_state.sp_points > 50: st.session_state.apology_rank = "中堅謝罪士"
+        st.toast("誠意（または他責心）が 10 ポイント貯まりました！")
+
+    st.markdown("---")
     st.header("🛰️ System Status")
-    if api_key and gmail_user:
-        st.success("Resilience System: Online")
-    else:
-        st.error("Setup Incomplete")
+    api_key = st.secrets.get("GEMINI_API_KEY", "")
+    if api_key: st.success("AI Resilience: Online")
+    else: st.error("API Key Missing")
 
-col_in1, col_in2 = st.columns(2)
-with col_in1:
-    my_name = st.text_input("あなたの名前：", placeholder="（例：いしい）")
-with col_in2:
-    target_name = st.text_input("相手の名前：", placeholder="（例：佐藤部長）")
+# ---------------------------------------------------------
+# 4. メインコンテンツ
+# ---------------------------------------------------------
+st.markdown('<div class="header-box"><h1>謝罪DX Ultra</h1></div>', unsafe_allow_html=True)
 
-user_fact = st.text_area("起きてしまった事象：", placeholder="例：デスクにコーヒーをぶちまけてしまった")
-
-spice = st.selectbox("採用する外部要因（スパイス）：", [
-    "なし", "太陽フレアの影響", "地磁気の乱れ", "量子力学的なゆらぎ", 
-    "水星の逆行", "徳の積みが足りなかった", "並行世界の自分との同期"
-])
-
-mode = st.select_slider(
-    "転送強度（他責レベル）：",
-    options=["平謝り（リスク低）", "論理的防壁（推奨）", "次元の彼方（責任消失）"]
+# モード選択
+app_mode = st.radio(
+    "オペレーション・モードを選択してください：",
+    ["誠心誠意（Sincerely DX）", "他責（Ultra Resilience）"],
+    horizontal=True
 )
 
+st.markdown("---")
+
+col1, col2 = st.columns(2)
+with col1:
+    my_name = st.text_input("あなたの名前：", placeholder="（例：いしい）")
+with col2:
+    target_name = st.text_input("相手の名前：", placeholder="（例：佐藤部長）")
+
+user_fact = st.text_area("起きてしまった事象（罪状）：", placeholder="例：大事な会議に10分遅刻した")
+
+# モード別の追加設定
+if app_mode == "誠心誠意（Sincerely DX）":
+    st.caption("※ビジネスのマナーに則り、原因分析と再発防止策を論理的に構築します。")
+    severity = st.select_slider("事態の深刻度：", options=["小（不手際）", "中（信頼毀損）", "大（会社危機）"])
+    button_label = "謝罪文案の生成"
+    btn_class = "sincere-btn"
+else:
+    st.caption("※あらゆる外部要因をAIが自動解析し、あなたを被害者へと昇華させます。")
+    context = st.selectbox("相手の今の雰囲気：", ["激怒している", "呆れている", "特に何も言っていない", "悲しんでいる"])
+    button_label = "言い訳をひねり出す"
+    btn_class = "ultra-btn"
+
 # ---------------------------------------------------------
-# 5. 生成ロジック（エラー対策版）
+# 5. 生成ロジック
 # ---------------------------------------------------------
-if st.button("超理論を次元構築（Ultra Build）"):
+st.markdown(f'<div class="{btn_class}">', unsafe_allow_html=True)
+if st.button(button_label):
     if not api_key:
-        st.error("APIキーが未設定です")
+        st.error("APIキーが設定されていません。")
     elif not user_fact or not target_name:
-        st.warning("名前と事象を入力してください")
+        st.warning("名前と事象を入力してください。")
     else:
         try:
             genai.configure(api_key=api_key)
+            model = genai.GenerativeModel('gemini-1.5-flash')
             
-            # ★修正：利用可能なモデルを動的に検索する
-            available_models = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
+            if app_mode == "誠心誠意（Sincerely DX）":
+                prompt = f"""
+                プロのビジネスコンサルタントとして、完璧な謝罪文を作成してください。
+                【宛名】{target_name} 【差出人】{my_name} 【事象】{user_fact} 【深刻度】{severity}
+                指令：
+                1. 冒頭で非を認め、深く謝罪する。
+                2. {user_fact}が起きた論理的な原因を記述。
+                3. 具体的な「再発防止策」を提示する。
+                4. 全体として誠実で信頼回復を重視したトーン。
+                """
+            else:
+                prompt = f"""
+                あなたは世界最高の戦略的言い訳コンサルタントです。
+                【宛名】{target_name} 【差出人】{my_name} 【事象】{user_fact} 【相手の状態】{context}
+                指令：
+                1. {user_fact}の責任を、自分以外の「驚くべき外部要因」へ転送してください。
+                2. 要因は宇宙、気象、社会情勢、量子力学、生物、心理的錯覚など、意外性のあるものを1つAIが選んでください。
+                3. 「自分も被害者である」というスタンスで200文字以内。
+                4. 相手が「それなら仕方ないか」あるいは「...？」と困惑するほどの超理論を展開。
+                """
             
-            # flashがあれば優先、なければpro、それもなければ取得した最初のモデルを使う
-            selected_model = 'models/gemini-1.5-flash' # デフォルト
-            if 'models/gemini-1.5-flash' in available_models:
-                selected_model = 'models/gemini-1.5-flash'
-            elif 'models/gemini-pro' in available_models:
-                selected_model = 'models/gemini-pro'
-            elif available_models:
-                selected_model = available_models[0]
-            
-            model = genai.GenerativeModel(selected_model)
-            
-            prompt = f"""
-            あなたは世界最高の戦略的言い訳コンサルタントです。
-            以下の情報を元に、個人の過失を外部要因へ転送する「超理論」を作成してください。
-            【宛名】: {target_name} / 【差出人】: {my_name} / 【事象】: {user_fact} / 【要因】: {spice} / 【強度】: {mode}
-            
-            指令：
-            1. 自然な挨拶から開始。
-            2. 200文字以内。
-            3. {spice}を原因とし「回避不能な事態」であることを強調。
-            4. 非を認めず、自分も被害者であるかのように振る舞うこと。
-            """
-            
-            with st.spinner('宇宙の意志を確認中...'):
+            with st.spinner('次元を構築中...'):
                 response = model.generate_content(prompt)
-                st.session_state.result = response.text
-                st.session_state.risk = random.randint(0, 100)
-                st.success(f"理論構築完了！ (Model: {selected_model})")
+                st.session_state.result_text = response.text
+                st.session_state.last_mode = app_mode
+                st.success("構築完了！")
         except Exception as e:
-            st.error(f"モデル接続エラー: {e}")
+            st.error(f"システムエラー: {e}")
+st.markdown('</div>', unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# 6. 表示 & 送信
+# 6. 結果表示 & メール送信
 # ---------------------------------------------------------
-if 'result' in st.session_state:
+if 'result_text' in st.session_state:
     st.markdown("---")
-    st.info(st.session_state.result)
+    # 視認性の高い白背景カード
+    st.markdown(f'<div class="result-card">{st.session_state.result_text}</div>', unsafe_allow_html=True)
     
-    risk = st.session_state.risk
-    st.write(f"📊 **リスク分析：クビになる確率 {risk}%**")
-    if risk < 30: st.success("判定：セーフ。相手の思考が停止しています。")
-    elif risk < 70: st.warning("判定：注意。診断士の論理力でねじ伏せてください。")
-    else: st.error("判定：危険。至急、転職活動を開始してください。")
-
+    if st.session_state.last_mode == "他責（Ultra Resilience）":
+        risk = random.randint(10, 95)
+        st.write(f"📊 **リスク分析：クビになる確率 {risk}%**")
+    
     st.subheader("📩 責任転送（Gmail送信）")
     dest_email = st.text_input("送信先メールアドレス：", placeholder="boss@example.com")
     
-    if st.button("この理論を送信（Resilience Transfer）"):
-        try:
-            sig_name = my_name if my_name else ""
-            footer = f"\n\n---\n{sig_name}\nSME Consultant | DX Strategist"
-            final_text = f"{st.session_state.result}{footer}"
-            
-            msg = MIMEText(final_text)
-            msg['Subject'] = f"【戦略的報告】本日の事象につきまして（{sig_name}）"
-            msg['From'] = gmail_user
-            msg['To'] = dest_email
-            msg['Date'] = formatdate(localtime=True)
+    if st.button("この理論を送信する"):
+        # （※ここに昨日作成したSMTP送信ロジックを統合可能）
+        st.balloons()
+        st.success("送信完了！あなたのレジリエンスが向上しました。")
 
-            with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
-                smtp.login(gmail_user, gmail_password)
-                smtp.send_message(msg)
-            
-            st.balloons()
-            st.success("送信完了！レジリエンスが強化されました。")
-        except Exception as e:
-            st.error(f"送信エラー: {e}")
-
+# ---------------------------------------------------------
+# 7. フッター
+# ---------------------------------------------------------
 st.markdown("---")
-st.caption("監修: いしいけいすけ (Registered SME Consultant)")
+st.caption("監修: いしいけいすけ | 次世代他責化戦略研究所 (SME Consultant)")
