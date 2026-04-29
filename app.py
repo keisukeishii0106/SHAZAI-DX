@@ -1,152 +1,92 @@
 import streamlit as st
-import google.generativeai as genai
-import random
 
-# ---------------------------------------------------------
-# 1. ページ設定
-# ---------------------------------------------------------
-st.set_page_config(page_title="謝罪DX Ultra", page_icon="🙇‍♂️", layout="centered")
+# ページの設定（タブに表示される名前など）
+st.set_page_config(page_title="Professional Dashboard", layout="centered")
 
-if 'sp_points' not in st.session_state:
-    st.session_state.sp_points = 0
-if 'apology_rank' not in st.session_state:
-    st.session_state.apology_rank = "見習い謝罪師"
-
-# ---------------------------------------------------------
-# 2. デザイン (宇宙ボタン & モード文字白化)
-# ---------------------------------------------------------
+# --- デザインと色味の反映 (CSS) ---
 st.markdown("""
     <style>
-    .stApp { background-color: #1e1b4b; color: #f8fafc; }
-    .centered-logo { display: flex; justify-content: center; margin-bottom: 20px; }
-    .centered-logo img { width: 450px !important; }
+        /* お気に入りの配色を定義 */
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #e74c3c;
+            --bg-light: #f4f7f6;
+        }
 
-    /* モード選択の文字を白く太く */
-    div[data-testid="stRadio"] label p {
-        color: #ffffff !important;
-        font-weight: 900 !important;
-        font-size: 1.15em !important;
-    }
-    
-    .stTextInput label, .stTextArea label { color: #ffffff !important; font-weight: bold !important; }
+        /* メイン背景とフォントの設定 */
+        .stApp {
+            background-color: #f4f7f6;
+        }
 
-    /* --- 生成ボタンのデザイン --- */
-    div.stButton > button {
-        width: 100% !important;
-        height: 4.5em !important;
-        border-radius: 15px !important;
-        border: 2px solid rgba(255, 255, 255, 0.2) !important;
-        font-weight: 900 !important;
-        transition: all 0.3s ease;
-    }
+        /* ヘッダーエリア */
+        .custom-header {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 0 0 15px 15px;
+            border-bottom: 4px solid #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
 
-    /* 誠心誠意モード：ビジネスブルー */
-    .sincere-btn div.stButton > button {
-        background: linear-gradient(135deg, #2563eb, #1e40af) !important;
-        color: #ffffff !important;
-    }
+        .brand-text {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #2c3e50;
+            letter-spacing: 2px;
+        }
 
-    /* 他責モード：宇宙グラデーション */
-    .ultra-btn div.stButton > button {
-        background: linear-gradient(135deg, #4c1d95, #7c3aed, #d4af37) !important;
-        background-size: 200% 200% !important;
-        color: #ffffff !important;
-        animation: space-shimmer 3s ease infinite;
-        border: 2px solid #d4af37 !important;
-    }
+        /* ヒーローエリア */
+        .hero-section {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 40px 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
 
-    @keyframes space-shimmer {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
-    }
-
-    div.stButton > button p { color: #ffffff !important; font-size: 1.3em !important; }
-
-    .result-card {
-        background-color: #ffffff !important; 
-        color: #1e1b4b !important;           
-        border: 4px solid #818cf8;
-        border-radius: 12px;
-        padding: 20px;
-        margin-top: 25px;
-    }
+        /* カードデザイン */
+        .info-card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            border-left: 5px solid #e74c3c;
+        }
     </style>
     """, unsafe_allow_html=True)
 
-# ---------------------------------------------------------
-# 3. ヘッダー
-# ---------------------------------------------------------
-st.markdown('<div class="centered-logo">', unsafe_allow_html=True)
-try: st.image("GEMINI_gazou.png")
-except: st.write("🌌")
-st.markdown('</div>', unsafe_allow_html=True)
-st.markdown('<h1 style="text-align: center; color:#e0e7ff;">謝罪DX Ultra</h1>', unsafe_allow_html=True)
+# --- 画面構成の作成 ---
 
-# ---------------------------------------------------------
-# 4. 入力エリア
-# ---------------------------------------------------------
-app_mode = st.radio("モード選択：", ["誠心誠意", "他責（Ultra Resilience）"], horizontal=True)
+# 1. カスタムヘッダー
+st.markdown('<div class="custom-header"><span class="brand-text">SYSTEM DASHBOARD</span></div>', unsafe_allow_html=True)
 
-col1, col2 = st.columns(2)
-with col1: my_name = st.text_input("あなたの名前：", placeholder="例：いしい")
-with col2: target_name = st.text_input("相手の名前：", placeholder="例：佐藤部長")
-user_fact = st.text_area("起きてしまった事象：", placeholder="例：デスクにコーヒーをぶちまけてしまった")
+# 2. ヒーローセクション
+st.markdown("""
+    <div class="hero-section">
+        <h1>Strategic Overview</h1>
+        <p>こだわりの色味とモダンなレイアウトを維持した軽量版です。</p>
+    </div>
+    """, unsafe_allow_html=True)
 
-if app_mode == "誠心誠意":
-    st.markdown('<div class="sincere-btn">', unsafe_allow_html=True)
-    execute = st.button("誠意を込めて生成")
-    st.markdown('</div>', unsafe_allow_html=True)
-    prompt_flavor = "ビジネスとして誠実、再発防止策を含む"
-else:
-    st.markdown('<div class="ultra-btn">', unsafe_allow_html=True)
-    execute = st.button("宇宙の理で言い訳する")
-    st.markdown('</div>', unsafe_allow_html=True)
-    prompt_flavor = "自分以外の外部要因へ責任転送。宇宙・気象・量子力学等の超理論を展開。"
+# 3. メインコンテンツ（カード）
+st.markdown("""
+    <div class="info-card">
+        <h2 style="color: #2c3e50; margin-top: 0;">Design Logic</h2>
+        <p>ロゴ画像の代わりに、CSSによるスタイリングで洗練された印象を作っています。<br>
+        Streamlitの標準コンポーネントとカスタムHTMLを組み合わせた構成です。</p>
+    </div>
+    """, unsafe_allow_html=True)
 
-# ---------------------------------------------------------
-# 5. 生成ロジック（404エラー対策：自動モデル選別）
-# ---------------------------------------------------------
-if execute:
-    api_key = st.secrets.get("GEMINI_API_KEY")
-    if not api_key:
-        st.error("APIキーが必要です")
-    else:
-        try:
-            genai.configure(api_key=api_key)
-            
-            # 【404対策】使えるモデルを動的に取得
-            models = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
-            
-            # gemini-1.5-flashがあれば使い、なければ最初に見つかったモデルを使う
-            model_name = "models/gemini-1.5-flash"
-            if model_name not in models:
-                model_name = models[0] if models else None
-            
-            if not model_name:
-                st.error("利用可能なAIモデルが見つかりません。")
-            else:
-                model = genai.GenerativeModel(model_name)
-                with st.spinner(f'AI({model_name})が構築中...'):
-                    response = model.generate_content(f"{user_fact}の謝罪文を150文字程度。指令：{prompt_flavor}")
-                    st.session_state.result_text = response.text
-                    
-                    # 成功時にポイント加算
-                    pts = random.randint(30, 70)
-                    st.session_state.sp_points += pts
-                    if st.session_state.sp_points > 500: st.session_state.apology_rank = "他責の神"
-                    elif st.session_state.sp_points > 200: st.session_state.apology_rank = "レジリエンス達人"
-                    elif st.session_state.sp_points > 50: st.session_state.apology_rank = "中堅謝罪士"
-                    st.toast(f"成功！ {pts} SP 獲得！")
-                    
-        except Exception as e:
-            if "429" in str(e):
-                st.error("【API制限中】1日の上限に達しました。明日復活します！")
-            else:
-                st.error(f"システムエラー: {e}")
+# 4. Streamlit標準のボタンも色味を合わせる（参考）
+if st.button("詳細データを確認する"):
+    st.balloons()
+    st.success("ボタンが押されました。ここに機能を実装できます！")
 
-if 'result_text' in st.session_state:
-    st.markdown(f'<div class="result-card">{st.session_state.result_text}</div>', unsafe_allow_html=True)
-
-st.markdown("---")
-st.caption("©開発者：いしいけいすけ(SME Consultant)")
+# 5. フッター
+st.markdown("""
+    <div style="text-align: center; margin-top: 50px; color: #95a5a6; font-size: 0.8rem;">
+        &copy; 2026 Management Strategy Office.
+    </div>
+    """, unsafe_allow_html=True)
