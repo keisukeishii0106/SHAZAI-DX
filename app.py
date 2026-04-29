@@ -79,7 +79,7 @@ with col2:
         pass
 
 st.markdown('<div class="logo-container"><h1>謝罪DX Ultra</h1></div>', unsafe_allow_html=True)
-st.caption("個人の過失を量子力学・地磁気・太陽フレアの責任へと戦略的に転送する、次世代の他責化ソリューション。")
+st.caption("個人の過失を鮮やかに他責化させる、次世代の謝罪DXソリューションアプリ")
 
 # ---------------------------------------------------------
 # 3. システム設定 (Secrets)
@@ -106,11 +106,6 @@ with col_in2:
 
 user_fact = st.text_area("罪状（起きてしまった事象）：", placeholder="例：デスクにコーヒーをぶちまけてしまった")
 
-spice = st.selectbox("採用する外部要因（スパイス）：", [
-    "なし", "太陽フレアの影響", "地磁気の乱れ", "量子力学的なゆらぎ", 
-    "水星の逆行", "徳の積みが足りなかった", "並行世界の自分との同期"
-])
-
 mode = st.select_slider(
     "転送強度（他責レベル）：",
     options=["平謝り（リスク低）", "論理的防壁（推奨）", "次元の彼方（責任消失）"]
@@ -119,7 +114,7 @@ mode = st.select_slider(
 # ---------------------------------------------------------
 # 5. 生成ロジック（エラー対策版）
 # ---------------------------------------------------------
-if st.button("超理論を次元構築（Ultra Build）"):
+if st.button("謝罪文案の生成（Ultra Build）"):
     if not api_key:
         st.error("APIキーが未設定です")
     elif not user_fact or not target_name:
@@ -150,7 +145,7 @@ if st.button("超理論を次元構築（Ultra Build）"):
             指令：
             1. 自然な挨拶から開始。
             2. 200文字以内。
-            3. {spice}を原因とし「回避不能な事態」であることを強調。
+            3. 自分とは無関係な事象を原因とし「回避不能な事態」であることを強調。
             4. 非を認めず、自分も被害者であるかのように振る舞うこと。
             """
             
@@ -171,21 +166,21 @@ if 'result' in st.session_state:
     
     risk = st.session_state.risk
     st.write(f"📊 **リスク分析：クビになる確率 {risk}%**")
-    if risk < 30: st.success("判定：セーフ。相手の思考が停止しています。")
-    elif risk < 70: st.warning("判定：注意。診断士の論理力でねじ伏せてください。")
-    else: st.error("判定：危険。至急、転職活動を開始してください。")
+    if risk < 30: st.success("判定：僅少。切り替えて頑張りましょう。")
+    elif risk < 70: st.warning("判定：やや危険。怒鳴り声に注意しましょう。")
+    else: st.error("判定：超危険！至急、転職活動を開始してください。")
 
     st.subheader("📩 責任転送（Gmail送信）")
     dest_email = st.text_input("送信先メールアドレス：", placeholder="boss@example.com")
     
-    if st.button("この理論を送信（Resilience Transfer）"):
+    if st.button("この謝罪文を送信（Resilience Transfer）"):
         try:
             sig_name = my_name if my_name else ""
             footer = f"\n\n---\n{sig_name}\nSME Consultant | DX Strategist"
             final_text = f"{st.session_state.result}{footer}"
             
             msg = MIMEText(final_text)
-            msg['Subject'] = f"【戦略的報告】本日の事象につきまして（{sig_name}）"
+            msg['Subject'] = f"【報告】本日の事象につきまして（{sig_name}）"
             msg['From'] = gmail_user
             msg['To'] = dest_email
             msg['Date'] = formatdate(localtime=True)
@@ -195,9 +190,9 @@ if 'result' in st.session_state:
                 smtp.send_message(msg)
             
             st.balloons()
-            st.success("送信完了！レジリエンスが強化されました。")
+            st.success("送信完了！おめでとうございます。")
         except Exception as e:
             st.error(f"送信エラー: {e}")
 
 st.markdown("---")
-st.caption("監修: いしいけいすけ (Registered SME Consultant)")
+st.caption("開発者: いしいけいすけ (Registered SME Consultant)")
