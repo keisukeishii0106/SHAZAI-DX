@@ -140,7 +140,7 @@ if st.button("謝罪文案の生成（Ultra Build）"):
             prompt = f"""
             あなたは世界最高の戦略的言い訳コンサルタントです。
             以下の情報を元に、個人の過失を外部要因へ転送する「超理論」を作成してください。
-            【宛名】: {target_name} / 【差出人】: {my_name} / 【事象】: {user_fact} / 【要因】: {spice} / 【強度】: {mode}
+            【宛名】: {target_name} / 【差出人】: {my_name} / 【事象】: {user_fact}  /【強度】: {mode}
             
             指令：
             1. 自然な挨拶から開始。
