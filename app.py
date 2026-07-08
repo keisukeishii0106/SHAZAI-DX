@@ -21,6 +21,7 @@ st.set_page_config(
 # ---------------------------------------------------------
 st.markdown(f"""
     <style>
+    /* 全体背景 */
     .stApp {{
         background-color: #0f172a;
         color: #f8fafc;
@@ -47,10 +48,25 @@ st.markdown(f"""
         line-height: 1.7;
         box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
     }}
+    /* 各種項目のラベルタイトル（あなたの名前：など） */
     label p {{
         color: #f3e5f5 !important;
         font-weight: bold;
     }}
+    
+    /* 🛠️ 【修正】テキスト入力欄・エリアの文字を確実に黒にする */
+    .stTextInput input, .stTextArea textarea {{
+        color: #000000 !important; /* 入力文字を黒に固定 */
+        background-color: #ffffff !important; /* 背景が白であることを保証 */
+        font-weight: 500 !important;
+    }}
+    
+    /* 🛠️ 【修正】薄いグレーのプレースホルダ文字（例：いしい、など）の見え方を調整 */
+    .stTextInput input::placeholder, .stTextArea textarea::placeholder {{
+        color: #6b7280 !important;
+    }}
+
+    /* 生成ボタン */
     .stButton>button {{
         width: 100%;
         border-radius: 30px;
@@ -123,10 +139,9 @@ if st.button("謝罪文案の生成（Ultra Build）"):
         try:
             genai.configure(api_key=api_key)
             
-            # ★修正：利用可能なモデルを動的に検索する
+            # 利用可能なモデルを動的に検索
             available_models = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
             
-            # flashがあれば優先、なければpro、それもなければ取得した最初のモデルを使う
             selected_model = 'models/gemini-1.5-flash' # デフォルト
             if 'models/gemini-1.5-flash' in available_models:
                 selected_model = 'models/gemini-1.5-flash'
